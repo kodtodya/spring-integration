@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.springframework.integration:spring-integration-core:5.3.0.BUILD-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/springframework/integration/spring-integration-core/5.3.0.BUILD-SNAPSHOT/spring-integration-core-5.3.0.BUILD-20200513.200351-157.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/springframework/integration/spring-integration-core/5.3.0.BUILD-SNAPSHOT/spring-integration-core-5.3.0.BUILD-20200513.200351-157-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/springframework/integration/spring-integration-core/5.3.0.BUILD-SNAPSHOT/spring-integration-core-5.3.0.BUILD-20200513.200351-157-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

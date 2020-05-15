@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:int-jdbc="http://www.springframework.org/schema/integration/jdbc"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xsi:schemaLocation="http://www.springframework.org/schema/jdbc https://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+		http://www.springframework.org/schema/integration https://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/jdbc https://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <jdbc:embedded-database id="datasource" type="H2">
+        <jdbc:script location="classpath:setup-tables.sql"/>
+    </jdbc:embedded-database>
+
+    <int:channel id="createTrainingRequestChannel"/>
+    <int:channel id="createTrainingReplyChannel"/>
+    <int:channel id="findTrainingRequestChannel"/>
+    <int:channel id="findTrainingReplyChannel"/>
+
+    <int:gateway id="trainingService" service-interface="com.kodtodya.si.jdbc.demo.service.TrainingService">
+        <int:method name="createTraining"
+                    request-channel="createTrainingRequestChannel"
+                    request-timeout="5000"
+                    reply-channel="createTrainingReplyChannel"
+                    reply-timeout="0"/>
+        <int:method name="findTrainingByName"
+                    request-channel="findTrainingRequestChannel"
+                    request-timeout="5000"
+                    reply-channel="findTrainingReplyChannel"
+                    reply-timeout="0"/>
+    </int:gateway>
+
+    <int-jdbc:outbound-gateway data-source="datasource"
+                               requires-reply="false"
+                               request-channel="findTrainingRequestChannel"
+                               query="select * from Training where lower(name)=lower(:payload)"
+                               reply-channel="findTrainingReplyChannel" row-mapper="trainingResultMapper"
+                               max-rows="100">
+    </int-jdbc:outbound-gateway>
+
+    <bean id="trainingResultMapper" class="com.kodtodya.si.jdbc.demo.domain.TrainingMapper"/>
+
+    <bean id="inputUtil" class="com.kodtodya.si.jdbc.demo.util.InputUtil"/>
+
+    <int-jdbc:outbound-gateway data-source="datasource"
+                               request-channel="createTrainingRequestChannel"
+                               reply-channel="createTrainingReplyChannel"
+                               update="insert into Training (id,name,durationInDays,preRequisite)
+										values
+										(:id,:name,:durationInDays,:preRequisite)"
+                               query="select * from Training where id = :id"
+                               request-sql-parameter-source-factory="requestSource"
+                               reply-sql-parameter-source-factory="replySource"
+                               row-mapper="trainingResultMapper"
+                               keys-generated="true"/>
+
+    <bean id="replySource" class="org.springframework.integration.jdbc.ExpressionEvaluatingSqlParameterSourceFactory">
+        <property name="parameterExpressions">
+            <map>
+                <entry key="id" value="#this.ID"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="requestSource" class="org.springframework.integration.jdbc.ExpressionEvaluatingSqlParameterSourceFactory">
+        <property name="parameterExpressions">
+            <map>
+                <entry key="id" value="payload.id"/>
+                <entry key="name" value="payload.name.toUpperCase()"/>
+                <entry key="durationInDays" value="payload.durationInDays"/>
+                <entry key="preRequisite" value="payload.preRequisite.toUpperCase()"/>
+            </map>
+        </property>
+    </bean>
+
+</beans>
