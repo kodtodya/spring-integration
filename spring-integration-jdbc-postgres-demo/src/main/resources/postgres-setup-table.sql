@@ -1,0 +1,7 @@
+-- Table creation
+create table Training(id integer primary key , name varchar(100), durationInDays integer, preRequisite varchar(100));
+
+-- Initial insertion
+INSERT INTO TRAINING(ID, NAME, DURATIONINDAYS,PREREQUISITE) VALUES (1, 'JAVA', 1,'OOPs');
+INSERT INTO TRAINING(ID, NAME, DURATIONINDAYS,PREREQUISITE) VALUES (2, 'SPRING', 3,'JAVA, PROGRAMMING, OOPS');
+INSERT INTO TRAINING(ID, NAME, DURATIONINDAYS,PREREQUISITE) VALUES (3, 'KAFKA', 3,'JAVA, SPRING, ZOOKEEPER');
